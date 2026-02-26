@@ -39,12 +39,22 @@ export const register = async (req, res) => {
 // LOGIN
 export const login = async (req, res) => {
     try{
+
         const {email, password} = req.body;
 
         const user = await User.findOne({email});
+
+        // console.log(req.cookies.token);
+
+        if (req.cookies.token)
+        {
+            return res.status(400).json({message : "Already logged in", 
+            user: {id: user._id, name: user.name, email: user.email}});
+        }
+
         
         if(!user)
-            return res.status(400).json({message: "Invalid credentials"});
+            return res.status(400).json({message: "User not found"});
 
         const isMatch = await bcrypt.compare(password, user.password);
 

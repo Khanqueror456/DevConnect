@@ -27,7 +27,7 @@ export const createPost = async (req, res) => {
 
 export const getPosts = async (req, res) => {
     try {
-        const posts = await Post.find().populate("author", "name email profilePic").sort({createdAt: -1});
+        const posts = await Post.find().populate("author", "name profilePic").populate("comments.user", "name profilePic").sort({createdAt: -1});
         
         res.json(posts);
     } catch(error)
@@ -71,5 +71,42 @@ export const toggleLike = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message : error.message});
+    }
+};
+
+export const addComent = async (req, res) => {
+    try {
+
+        const {postId} = req.params;
+        const {text} = req.body;
+
+        if (!text)
+        {
+            return res.status(400).json({message : "Comment text is required"});
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post)
+        {
+            return res.status(404).json({message : "Post not found"});
+        }
+
+        const newComment = {
+            user: req.user._id,
+            text,
+        };
+
+        post.comments.push(newComment);
+
+        await post.save();
+
+        res.status(201).json({
+            message : "Comment added successfully",
+            commentsCount : post.comments.length,
+        });
+
+    } catch(error){
+        res.status(500).json({message : error.message});
     }
 };

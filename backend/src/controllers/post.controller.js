@@ -27,9 +27,22 @@ export const createPost = async (req, res) => {
 
 export const getPosts = async (req, res) => {
     try {
-        const posts = await Post.find().populate("author", "name profilePic").populate("comments.user", "name profilePic").sort({createdAt: -1});
+
+        let page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 5;
+
+        const skip = (page - 1) * limit;
+
+        const totalPosts = await Post.countDocuments();
+
+        const posts = await Post.find().populate("author", "name profilePic").populate("comments.user", "name profilePic").sort({createdAt: -1}).skip(skip).limit(limit);
         
-        res.json(posts);
+        res.json({
+            currentPage : page,
+            totalPage : Math.ceil(totalPosts / limit),
+            totalPosts,
+            posts
+        });
     } catch(error)
     {
         res.status(500).json({message : error.message});

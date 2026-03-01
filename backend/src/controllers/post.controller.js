@@ -28,6 +28,8 @@ export const createPost = async (req, res) => {
 export const getPosts = async (req, res) => {
     try {
 
+        // Pagination logic added
+
         let page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 5;
 

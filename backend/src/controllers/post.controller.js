@@ -35,21 +35,59 @@ export const getPosts = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
+        const userId = req.user._id;
+
         const totalPosts = await Post.countDocuments();
 
         const posts = await Post.find().populate("author", "name profilePic").populate("comments.user", "name profilePic").sort({createdAt: -1}).skip(skip).limit(limit);
+
+        // 🔥 Add isLikedByMe flag
+        const postsWithLikeFlag = posts.map((post) => {
+            const isLikedByMe = post.likes.some(
+                (id) => id.toString() === userId.toString()
+            );
+
+            return {
+                ...post.toObject(),
+                isLikedByMe,
+            };
+        });
         
         res.json({
             currentPage : page,
             totalPage : Math.ceil(totalPosts / limit),
             totalPosts,
-            posts
+            posts : postsWithLikeFlag,
         });
     } catch(error)
     {
         res.status(500).json({message : error.message});
     }
 }
+
+export const deletePost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const post = await Post.findById(postId);
+
+        if (!post){
+            return res.status(404).json({message : "Post not found"});
+        }
+
+        // OwnerShip check
+        if (post.author.toString() !== req.user._id.toString()){
+            return res.status(403).json({message : "Not authorized to delete this post"});
+        }
+
+        await post.deleteOne();
+
+        res.json({ message : "Post deleted successfully"});
+
+    } catch(error){
+        res.status(500).json({ message : error.message});
+    }
+};
 
 export const toggleLike = async (req, res) => {
     try {
@@ -139,26 +177,36 @@ export const addComent = async (req, res) => {
     }
 };
 
-export const deletePost = async (req, res) => {
+export const deleteComment = async (req, res) => {
+
     try {
-        const { postId } = req.params;
+        const {postId, commentId} = req.params;
+        const userId = req.user._id;
 
         const post = await Post.findById(postId);
 
         if (!post){
-            return res.status(404).json({message : "Post not found"});
+            return res.status(404).json({ message : "Post not found"});
         }
 
-        // OwnerShip check
-        if (post.author.toString() !== req.user._id.toString()){
-            return res.status(403).json({message : "Not authorized to delete this post"});
+        const comment = post.comments.id(commentId);
+
+        if (!comment) {
+            return res.status(404).json({ message : "Comment not found"});
         }
 
-        await post.deleteOne();
+        // 🔐 Ownership Check
+        if (comment.user.toString() !== userId.toString()){
+            return res.status(403).json({ message : "Not authorized to delete this comment"});
+        }
 
-        res.json({ message : "Post deleted successfully"});
+        // 🔥 Remove subdocument
+        comment.deleteOne();
 
-    } catch(error){
+        await post.save();
+
+        res.json({ message : "Comment deleted successfully"});
+    } catch (error) {
         res.status(500).json({ message : error.message});
     }
 };

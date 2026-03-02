@@ -64,25 +64,38 @@ export const toggleLike = async (req, res) => {
 
         const userId = req.user._id;
 
-        const alreadyLiked = post.likes.includes(userId);
+        const alreadyLiked = post.likes.some(
+            (id) => id.toString() === userId.toString()
+        );
+
+        let updatedPost;
 
         if (alreadyLiked)
         {
-            post.likes = post.likes.filter(
-                (id) => id.toString() !== userId.toString()
+            // 🔥 Unlike using $pull
+            updatedPost = await Post.findByIdAndUpdate(
+                postId,
+                { $pull : {likes : userId}},
+                {returnDocument : "after"}
             );
         }
 
-        else
-        {
-            post.likes.push(userId);
+        else {
+            // 🔥 Like using $addToSet (prevents duplicates)
+
+            updatedPost = await Post.findByIdAndUpdate(
+                postId,
+                { $addToSet : {likes : userId}},
+                { returnDocument : "after"}
+            );
+            
         }
 
-        await post.save();
+        // await post.save();
 
         res.json({
             message : alreadyLiked ? "Post unliked" : "Post liked",
-            totalLikes : post.likes.length,
+            totalLikes : updatedPost.likes.length,
         });
     } catch (error) {
         res.status(500).json({ message : error.message});

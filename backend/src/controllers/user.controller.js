@@ -76,3 +76,47 @@ export const acceptConnectionRequest = async (req, res) => {
         res.status(500).json({ message : error.message});
     }
 };
+
+
+export const rejectConnectionRequest = async (req, res) => {
+    try {
+        const currentUserId = req.user._id;
+        const { userId } = req.params;
+
+        const currentUser = await User.findById(currentUserId);
+
+        if (!currentUser)
+        {
+            return res.status(404).json({ message : "User not found"});
+        }
+
+        // Check if request exists
+        if (!currentUser.connectionRequests.includes(userId))
+        {
+            return res.status(400).json({ message : "No connection request found" });
+        }
+
+        // Remove request
+        currentUser.connectionRequests = currentUser.connectionRequests.filter(
+            (id) => id.toString() !== userId.toString()
+        );
+
+        await currentUser.save();
+
+        res.json({ message : "Connection request rejected" });
+    } catch (error) {
+        res.status(500).json({ message : error.message });
+    }
+};
+
+export const getConnectionRequests = async (req, res) => {
+    try {
+        
+        const user = await User.findById(req.user._id)
+        .populate("connectionRequests", "name profilePic");
+
+        res.json(user.connectionRequests);
+    } catch (error) {
+        res.status(500).json({ message : error.message });
+    }
+};

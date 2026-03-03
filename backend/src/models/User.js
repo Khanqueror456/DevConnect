@@ -8,6 +8,20 @@ const userSchema = new mongoose.Schema(
         bio: {type: String, default: ""},
         skills: [{type: String}],
         profilePic: {type: String, default: ""},
+
+        connections : [
+            {
+                type : mongoose.Schema.Types.ObjectId,
+                ref : "User",
+            }
+        ],
+
+        connectionRequests : [
+            {
+                type : mongoose.Schema.Types.ObjectId,
+                ref : "User"
+            }
+        ],
     }, {timestamps: true}
 );
 

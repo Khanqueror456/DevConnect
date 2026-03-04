@@ -3,7 +3,7 @@ import api from "../api/axios";
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({childern}) => {
+export const AuthProvider = ({children}) => {
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -13,6 +13,7 @@ export const AuthProvider = ({childern}) => {
             const res = await api.get("/auth/me");
             setUser(res.data);
         } catch (err) {
+            console.log(err)
             setUser(null);
         } finally {
             setLoading(false);
@@ -30,7 +31,7 @@ export const AuthProvider = ({childern}) => {
 
     return (
         <AuthContext.Provider value={{ user, setUser, logout, loading }}>
-            {childern}
+            {children}
         </AuthContext.Provider>
     );
 };

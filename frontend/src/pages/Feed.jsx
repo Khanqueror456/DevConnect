@@ -27,7 +27,7 @@ export default function Feed() {
             ) : (
                 posts.map((post) => (
                     <div key={post._id} className="border m-[10px] p-[10px]">
-                        <p>{}post.content</p>
+                        <p>{post.content}</p>
                         <p>Likes: {post.likes.length}</p>
                     </div>
                     

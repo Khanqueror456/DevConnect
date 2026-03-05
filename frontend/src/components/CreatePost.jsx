@@ -12,9 +12,12 @@ export default function CreatePost({ onPostCreated }) {
 
         try {
             const res = await api.post("/posts", { content });
+            const res2 = await api.get(`/posts/${res.data.post._id}`);
+
+            const newPost = res2.data.post;
 
             // Add new post to feed;
-            onPostCreated(res.data.post);
+            onPostCreated(newPost);
 
             setContent("");
         } catch(error) {

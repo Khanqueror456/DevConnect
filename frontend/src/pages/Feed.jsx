@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import CreatePost from "../components/CreatePost";
+import PostCard from "../components/PostCard";
 
 export default function Feed() {
 
     const [posts, setPosts] = useState([]);
-    const {logout} = useAuth();
+    const { logout } = useAuth();
 
     const fetchPosts = async () => {
         try {
@@ -22,16 +23,22 @@ export default function Feed() {
         fetchPosts();
     }, []);
 
-    useEffect(() => {
-        console.log(posts);
-    }, [posts]);
-
     const handleNewPost = (newPost) => {
         setPosts([newPost, ...posts]);
     };
 
+    const handleLikeToggle = (postId, updatedPost) => {
+        setPosts((prevPosts) =>
+            prevPosts.map((p) =>
+                p._id === postId
+                    ? updatedPost
+                    : p
+            )
+        );
+    };
+
     return (
-        <div>
+        <div className="max-w-[600px] mx-auto">
             <h1>DevConnect Feed</h1>
 
             <CreatePost onPostCreated={handleNewPost} />
@@ -40,11 +47,12 @@ export default function Feed() {
                 <p>No posts yet</p>
             ) : (
                 posts.map((post) => (
-                    <div key={post._id} className="border m-[10px] p-[10px]">
-                        <p>{post.content}</p>
-                        <p>Likes: {post.likes?.length || 0}</p>
-                    </div>
-                    
+                    <PostCard 
+                    key={post._id} 
+                    post={post} 
+                    onLikeToggle={handleLikeToggle}
+                    />
+
                 ))
             )}
 

@@ -1,4 +1,9 @@
+import { useAuth } from "../context/AuthContext";
+
 export default function Navbar() {
+
+  const { logout } = useAuth();
+
   return (
     <div className="border-b border-gray-800 bg-[#020617]">
 
@@ -20,6 +25,10 @@ export default function Navbar() {
 
           <button className="hover:text-white">
             Profile
+          </button>
+
+          <button onClick={logout} className="text-white hover:cursor-pointer bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg font-medium">
+            Logout
           </button>
 
         </div>

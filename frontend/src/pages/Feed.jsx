@@ -27,7 +27,7 @@ export default function Feed() {
         setPosts([newPost, ...posts]);
     };
 
-    const handleLikeToggle = (postId, updatedPost) => {
+    const handlePostUpdate = (postId, updatedPost) => {
         setPosts((prevPosts) =>
             prevPosts.map((p) =>
                 p._id === postId
@@ -50,7 +50,7 @@ export default function Feed() {
                     <PostCard 
                     key={post._id} 
                     post={post} 
-                    onLikeToggle={handleLikeToggle}
+                    onPostUpdate={handlePostUpdate}
                     />
 
                 ))

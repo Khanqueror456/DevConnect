@@ -1,12 +1,13 @@
 import api from "../api/axios";
+import CommentSection from "./CommentSection";
 
-const PostCard = ({ post, onLikeToggle }) => {
+const PostCard = ({ post, onPostUpdate }) => {
 
     const handleLike = async () => {
         try {
             const res = await api.put(`/posts/${post._id}/like`);
 
-            onLikeToggle(post._id, res.data.updatedPost);
+            onPostUpdate(post._id, res.data.updatedPost);
         } catch (error) {
             console.error(error);
         }
@@ -23,6 +24,7 @@ const PostCard = ({ post, onLikeToggle }) => {
                 <span>Likes : {post.likes.length}</span>
                 <span className='ml-[10px]'>Comments: {post.comments.length}</span>
             </div>
+            <CommentSection post={post} onPostUpdate={onPostUpdate} />
         </div>
     );
 }

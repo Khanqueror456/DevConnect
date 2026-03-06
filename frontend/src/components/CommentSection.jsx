@@ -14,13 +14,25 @@ export default function CommentSection ({ post, onPostUpdate}) {
             const res = await api.post(`/posts/${post._id}/comment`, {
                 text,
             });
-            
-            onPostUpdate(post._id, res.data.post);
+            console.log("Post from comment section", res.data.updatedPost);
+            onPostUpdate(post._id, res.data.updatedPost);
 
             setText("");
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            const res = await api.delete(
+                `/posts/${post._id}/comment/${commentId}`
+            );
+
+            onPostUpdate(post._id, res.data.updatedPost);
+        } catch (error) {
+        console.error(error);
+    } 
     };
 
     return (
@@ -40,7 +52,9 @@ export default function CommentSection ({ post, onPostUpdate}) {
             <div className="mt-[10px]">
                 {post.comments.map((comment) => (
                     <div key={comment._id} className="text-md">
-                        <b>{comment.user?.name || "User"}:</b> {comment.text}
+                        <b>{comment.user?.name || "User"}:</b><span>{comment.text}</span>
+
+                        <button className="ml-2" onClick={() => handleDeleteComment(comment._id)}>❌</button>
                     </div>
                 ))}
             </div>

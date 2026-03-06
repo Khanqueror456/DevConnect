@@ -1,68 +1,83 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AuthLayout from "../components/AuthLayout";
 import api from "../api/axios";
+import { useNavigate, Link } from "react-router-dom";
 
-const Register = () => {
-    const navigate = useNavigate();
+export default function Register(){
 
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        password: ""
-    });
+  const [name,setName] = useState("");
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
 
-    const handleChange = (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value
-        });
-    };
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleRegister = async (e)=>{
+    e.preventDefault();
 
-        try {
-            await api.post("/auth/register", form);
-            alert("Registration successful");
-            navigate("/login");
-        } catch (error) {
-            alert(error.response?.data?.message || "Registration failed");
-        }
-    };
+    try{
+      await api.post("/auth/register",{name,email,password});
+      navigate("/login");
+    }catch(err){
+      alert("Registration failed");
+    }
+  };
 
-    return (
-        <div>
-            <h2>Register</h2>
+  return(
+    <AuthLayout
+      leftContent={
+        <>
+          <h1 className="text-3xl font-bold mb-4">
+            DevConnect
+          </h1>
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    value={form.name}
-                    onChange={handleChange}
-                />
+          <p className="text-gray-400">
+            Connect, Collaborate, and Grow with Your Peers.
+          </p>
+        </>
+      }
+    >
 
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={handleChange}
-                />
+      <h2 className="text-2xl font-semibold mb-6">Create Account</h2>
 
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={form.password}
-                    onChange={handleChange}
-                />
+      <form onSubmit={handleRegister} className="space-y-4">
 
-                <button type="submit">Register</button>
-            </form>
-        </div>
-    );
-};
+        <input
+          placeholder="Name"
+          value={name}
+          onChange={(e)=>setName(e.target.value)}
+          className="w-full bg-transparent border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
+        />
 
-export default Register;
+        <input
+          placeholder="Email"
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
+          className="w-full bg-transparent border border-gray-600 rounded-lg px-4 py-3"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
+          className="w-full bg-transparent border border-gray-600 rounded-lg px-4 py-3"
+        />
+
+        <button
+          className="w-full bg-blue-600 hover:bg-blue-700 transition rounded-lg py-3 font-semibold"
+        >
+          Sign Up
+        </button>
+
+      </form>
+
+      <p className="text-sm text-gray-400 mt-4 text-center">
+        Already have an account?{" "}
+        <Link to="/login" className="text-blue-400 hover:underline">
+          Login
+        </Link>
+      </p>
+
+    </AuthLayout>
+  );
+}

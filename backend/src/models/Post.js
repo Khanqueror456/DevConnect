@@ -1,42 +1,47 @@
 import mongoose from "mongoose";
 
-const commetSchema = new mongoose.Schema({
-    user : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : "User",
-        required : true,
+const commentSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     },
-    text : {
-        type : String,
-        required : true,
+    text: {
+        type: String,
+        required: true,
     },
 },
-    {timestamps : true}
+    { timestamps: true }
 );
 
+// Add self-reference after schema is defined
+commentSchema.add({
+    replies: [commentSchema]
+});
+
 const postSchema = new mongoose.Schema({
-    
-    author : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : "User",
+
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
     },
-    content : {
-        type : String,
-        required : true,
+    content: {
+        type: String,
+        required: true,
     },
-    image : {
-        type : String,
-        default : "",
+    image: {
+        type: String,
+        default: "",
     },
-    likes : [
+    likes: [
         {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : "User",
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
         }
     ],
-    comments : [commetSchema],
+    comments: [commentSchema],
 },
-    {timestamps : true}
+    { timestamps: true }
 );
 
 const Post = mongoose.model("Post", postSchema);

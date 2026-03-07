@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/", protect, createPost);
 router.get("/", protect, getPosts);
-router.get("/:postId", getPost);
+router.get("/:postId", protect, getPost);
 router.put("/:postId/like", protect, toggleLike);
 router.post("/:postId/comment", protect, addComent);
 router.delete("/:postId", protect, deletePost);

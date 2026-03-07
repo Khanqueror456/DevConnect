@@ -27,12 +27,14 @@ export const createPost = async (req, res) => {
 export const getPost = async (req, res) => {
     try {
         const { postId } = req.params;
+        console.log("This is the postId", postId);
         const userId = req.user._id;
         const post = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
+        console.log(post);
         const isLikedByMe = post.likes.some(
                 (id) => id.toString() === userId.toString()
             );
-        res.json({...post, isLikedByMe});
+        res.json({...post.toObject(), isLikedByMe});
     } catch (error) {
         res.json({ message: error.message });
     }
@@ -169,7 +171,7 @@ export const addComent = async (req, res) => {
             return res.status(400).json({ message: "Comment text is required" });
         }
 
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId);;
 
         if (!post) {
             return res.status(404).json({ message: "Post not found" });
@@ -184,8 +186,11 @@ export const addComent = async (req, res) => {
 
         await post.save();
 
+        const updatedPost = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
+
         res.status(201).json({
             message: "Comment added successfully",
+            updatedPost,
             commentsCount: post.comments.length,
         });
 
@@ -222,7 +227,9 @@ export const deleteComment = async (req, res) => {
 
         await post.save();
 
-        res.json({ message: "Comment deleted successfully" });
+        const updatedPost = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
+
+        res.json({ message: "Comment deleted successfully", updatedPost });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

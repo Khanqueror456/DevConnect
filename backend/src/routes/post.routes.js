@@ -1,5 +1,5 @@
 import express from "express";
-import {createPost, getPost, getPosts, deletePost, toggleLike, addComent, deleteComment} from "../controllers/post.controller.js";
+import {createPost, getPost, getPosts, deletePost, toggleLike, addComent, deleteComment, addCommentReply} from "../controllers/post.controller.js";
 import {protect} from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -9,6 +9,7 @@ router.get("/", protect, getPosts);
 router.get("/:postId", protect, getPost);
 router.put("/:postId/like", protect, toggleLike);
 router.post("/:postId/comment", protect, addComent);
+router.post("/:postId/comment/:commentId", protect, addCommentReply);
 router.delete("/:postId", protect, deletePost);
 router.delete("/:postId/comment/:commentId", protect, deleteComment);
 

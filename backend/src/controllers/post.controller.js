@@ -32,9 +32,9 @@ export const getPost = async (req, res) => {
         const post = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
         console.log(post);
         const isLikedByMe = post.likes.some(
-                (id) => id.toString() === userId.toString()
-            );
-        res.json({...post.toObject(), isLikedByMe});
+            (id) => id.toString() === userId.toString()
+        );
+        res.json({ ...post.toObject(), isLikedByMe });
     } catch (error) {
         res.json({ message: error.message });
     }
@@ -144,11 +144,11 @@ export const toggleLike = async (req, res) => {
         let updatedPost = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
 
         const isLikedByMe = updatedPost.likes.some(
-                (id) => id.toString() === userId.toString()
-            );
+            (id) => id.toString() === userId.toString()
+        );
 
-            console.log(updatedPost);
-        updatedPost = {...updatedPost.toObject(), isLikedByMe};
+        console.log(updatedPost);
+        updatedPost = { ...updatedPost.toObject(), isLikedByMe };
 
 
         res.json({
@@ -234,3 +234,46 @@ export const deleteComment = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const addCommentReply = async (req, res) => {
+
+    try {
+        const { postId, commentId } = req.params;
+        const {text} = req.body;
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.json({ message: "Post not found" });
+        }
+
+        const comment = post.comments.id(commentId);
+
+        if (!comment){
+            return res.json({ message : "Comment not found"} );
+        }
+
+        const newReply = {
+            user: req.user._id,
+            text
+        }
+
+        comment.replies.push(newReply);
+
+        await post.save();
+
+        const updatedPost = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
+
+        res.json({
+            message: "Reply added successfully",
+            updatedPost
+        })
+
+
+
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+
+
+}

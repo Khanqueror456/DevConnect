@@ -19,6 +19,15 @@ export default function CommentSection({ post, onPostUpdate }) {
         }
     };
 
+    const handleCommentLike = async (commentId) => {
+        try{
+            const res = await api.put(`posts/${post._id}/like/${commentId}`);
+            onPostUpdate(post._id, res.data.updatedPost);
+        }catch(error){
+            console.error(error);
+        }
+    }
+
     const handleDeleteComment = async (commentId) => {
         try {
             const res = await api.delete(`/posts/${post._id}/comment/${commentId}`);
@@ -97,7 +106,7 @@ export default function CommentSection({ post, onPostUpdate }) {
 
                             {/* Comment Actions */}
                             <div className="flex items-center gap-4 text-xs text-gray-400 mt-1 ml-2">
-                                <button className="hover:text-white">Like</button>
+                                <button onClick={() => {handleCommentLike(comment._id)}} className={`${comment.isLikedByMe ? "text-red-500" : ""}`}>{comment.isLikedByMe ? "❤️ Like " : "Like "}{comment.likes.length}</button>
                                 <button
                                     className="hover:text-white"
                                     onClick={() =>
@@ -144,7 +153,6 @@ export default function CommentSection({ post, onPostUpdate }) {
                                 <div className="mt-3 space-y-3 pl-4 border-l-2 border-gray-700">
                                     {comment.replies.map((reply) => (
                                         <div key={reply._id} className="flex gap-3">
-                                            {console.log(reply)}
                                             {/* Avatar */}
                                             <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
                                                 {reply.user?.name?.[0] || "U"}

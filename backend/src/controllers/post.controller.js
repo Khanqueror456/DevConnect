@@ -33,6 +33,9 @@ export const getPost = async (req, res) => {
         const isLikedByMe = post.likes.some(
             (id) => id.toString() === userId.toString()
         );
+        post.comments.forEach(comment => {
+            comment.replies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        });
         res.json({ ...post.toObject(), isLikedByMe });
     } catch (error) {
         res.json({ message: error.message });
@@ -57,6 +60,9 @@ export const getPosts = async (req, res) => {
 
         // 🔥 Add isLikedByMe flag
         const postsWithLikeFlag = posts.map((post) => {
+            post.comments.forEach(comment => {
+                comment.replies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            });
             const isLikedByMe = post.likes.some(
                 (id) => id.toString() === userId.toString()
             );
@@ -154,6 +160,59 @@ export const toggleLike = async (req, res) => {
             message: alreadyLiked ? "Post unliked" : "Post liked",
             updatedPost,
             totalLikes: updatedPosts.likes.length,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const toggleCommentLike = async (req, res) => {
+    try {
+        const { postId, commentId } = req.params;
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        const comment = post.comments.id(commentId);
+
+        const userId = req.user._id;
+
+        const alreadyLiked = comment.likes.some(
+            (id) => id.toString() === userId.toString()
+        );
+
+        let updatedPosts;
+
+        if (alreadyLiked) {
+            comment.likes = comment.likes.filter((id) => 
+                id.toString() !== userId.toString()
+            )
+        }
+
+        else {
+
+            comment.likes.push(userId);
+
+        }
+
+        await post.save();
+
+        let updatedPost = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
+
+        const isLikedByMe = comment.likes.some(
+            (id) => id.toString() === userId.toString()
+        );
+
+        updatedPost = { ...updatedPost.toObject(), isLikedByMe };
+
+
+        res.json({
+            message: alreadyLiked ? "Post unliked" : "Post liked",
+            updatedPost,
+            totalLikes: comment.likes.length,
         });
     } catch (error) {
         res.status(500).json({ message: error.message });

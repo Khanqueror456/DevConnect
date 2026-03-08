@@ -29,8 +29,7 @@ export const getPost = async (req, res) => {
         const { postId } = req.params;
         console.log("This is the postId", postId);
         const userId = req.user._id;
-        const post = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
-        console.log(post);
+        const post = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic").populate("comments.replies.user", "name profilePic");
         const isLikedByMe = post.likes.some(
             (id) => id.toString() === userId.toString()
         );
@@ -54,7 +53,7 @@ export const getPosts = async (req, res) => {
 
         const totalPosts = await Post.countDocuments();
 
-        const posts = await Post.find().populate("author", "name profilePic").populate("comments.user", "name profilePic").sort({ createdAt: -1 }).skip(skip).limit(limit);
+        const posts = await Post.find().populate("author", "name profilePic").populate("comments.user", "name profilePic").populate("comments.replies.user", "name profilePic").sort({ createdAt: -1 }).skip(skip).limit(limit);
 
         // 🔥 Add isLikedByMe flag
         const postsWithLikeFlag = posts.map((post) => {
@@ -239,7 +238,7 @@ export const addCommentReply = async (req, res) => {
 
     try {
         const { postId, commentId } = req.params;
-        const {text} = req.body;
+        const { text } = req.body;
 
         const post = await Post.findById(postId);
 
@@ -249,8 +248,8 @@ export const addCommentReply = async (req, res) => {
 
         const comment = post.comments.id(commentId);
 
-        if (!comment){
-            return res.json({ message : "Comment not found"} );
+        if (!comment) {
+            return res.json({ message: "Comment not found" });
         }
 
         const newReply = {
@@ -262,7 +261,13 @@ export const addCommentReply = async (req, res) => {
 
         await post.save();
 
-        const updatedPost = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
+        const updatedPost = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic").populate("comments.replies.user", "name profilePic");
+        // Sort replies in each comment by createdAt ascending
+        updatedPost.comments.forEach(comment => {
+            comment.replies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        });
+
+        // console.log(updatedPost)
 
         res.json({
             message: "Reply added successfully",

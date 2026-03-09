@@ -1,4 +1,5 @@
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
 
@@ -16,7 +17,7 @@ export default function Navbar() {
         <div className="flex gap-6 text-gray-400">
 
           <button className="hover:text-white">
-            Feed
+           <Link to="/">Feed</Link>
           </button>
 
           <button className="hover:text-white">

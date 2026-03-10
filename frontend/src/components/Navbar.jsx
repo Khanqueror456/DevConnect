@@ -21,11 +21,11 @@ export default function Navbar() {
           </button>
 
           <button className="hover:text-white">
-            <Link to={"/connections"}>Connections</Link>
+            <Link to="/connections">Connections</Link>
           </button>
 
           <button className="hover:text-white">
-            Profile
+            <Link to="/profile">Profile</Link>
           </button>
 
           <button onClick={logout} className="text-white hover:cursor-pointer bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg font-medium">

@@ -21,7 +21,7 @@ export default function Navbar() {
           </button>
 
           <button className="hover:text-white">
-            Connections
+            <Link to={"/connections"}>Connections</Link>
           </button>
 
           <button className="hover:text-white">

@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Feed from "./pages/Feed";
 // import Profile from "./pages/Profile";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import Connections from "./pages/Connections"
 
 function App() {
   
@@ -14,6 +15,7 @@ function App() {
     <Routes>
       <Route path='/login' element={<Login />}/>
       <Route path="/register" element={<Register />} />
+      <Route path="/connections"  element={Connections}/>
 
       <Route
         path='/'

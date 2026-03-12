@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "../components/Navbar"
 
 const SUGGESTIONS = [
   {
@@ -195,48 +196,7 @@ export default function Connections() {
       }}
     >
       {/* ── NAV ── */}
-      <nav
-        className="sticky top-0 z-50 backdrop-blur-xl"
-        style={{
-          backgroundColor: "rgba(10,15,30,0.85)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
-        <div className="mx-auto max-w-6xl flex items-center justify-between px-6 h-14">
-          <span
-            className="font-bold text-lg tracking-tight bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(90deg,#60a5fa,#22d3ee)" }}
-          >
-            DevConnect
-          </span>
-          <div className="flex items-center gap-1">
-            {["Feed", "Connections", "Profile"].map((link) => (
-              <a
-                key={link}
-                href="#"
-                className="text-sm font-medium px-3 py-1.5 rounded-lg transition-all"
-                style={
-                  link === "Connections"
-                    ? {
-                        color: "#f1f5f9",
-                        backgroundColor: "rgba(59,130,246,0.12)",
-                        border: "1px solid rgba(59,130,246,0.2)",
-                      }
-                    : { color: "#94a3b8" }
-                }
-              >
-                {link}
-              </a>
-            ))}
-            <button
-              className="ml-2 text-sm font-semibold px-4 py-1.5 rounded-lg text-white"
-              style={{ backgroundColor: "#3b82f6" }}
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navbar/>
 
       {/* ── LAYOUT ── */}
       <div className="mx-auto max-w-6xl px-4 py-6 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-5 items-start">

@@ -14,7 +14,12 @@ const commentSchema = new mongoose.Schema({
     likes : [{
         type : mongoose.Schema.Types.ObjectId,
         ref : "User",
-    }]
+    }],
+
+    isLikedByMe : {
+        type : Boolean,
+        default : false
+    }
 },
     { timestamps: true }
 );

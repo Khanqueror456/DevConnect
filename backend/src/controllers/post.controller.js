@@ -198,21 +198,24 @@ export const toggleCommentLike = async (req, res) => {
 
         }
 
+        const isLikedByMe = comment.likes.some(
+            (id) => id.toString() === userId.toString()
+        );
+        
+        if (isLikedByMe)
+            comment.isLikedByMe = true;
+        else
+            comment.isLikedByMe = false;
+
         await post.save();
 
         let updatedPost = await Post.findById(postId).populate("author", "name profilePic").populate("comments.user", "name profilePic");
 
-        const isLikedByMe = comment.likes.some(
-            (id) => id.toString() === userId.toString()
-        );
-
-        updatedPost = { ...updatedPost.toObject(), isLikedByMe };
-
-
         res.json({
-            message: alreadyLiked ? "Post unliked" : "Post liked",
+            message: alreadyLiked ? "Comment unliked" : "Comment liked",
             updatedPost,
             totalLikes: comment.likes.length,
+            isCommentLikedByMe : comment.isLikedByMe
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
